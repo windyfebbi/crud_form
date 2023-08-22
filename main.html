@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <style>
+      .nav-link {
+        cursor:pointer;
+      }
+
+      #loading {
+        position:fixed;
+        top:0;
+        left:0;
+        z-index:10000;
+        width:100vw;
+        height:100vh;
+        background-color:rgba(255,255,255,0.9);   // 255 code white color 
+      }
+    </style>
+
+
+  </head>
+  <body>
+
+    <div class="container">
+      <nav id="navigation" class="mb-3">
+        <ul class="nav nav-tabs main-nav">
+          <li class="nav-item">
+            <div class="nav-link active" id="search-link">Search</div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" id="input-mutasi-link">Input</div>
+          </li>
+        </ul>
+      </nav>
+
+      <div id="app"></div>
+      </div>
+
+      <div id="loading" class="d-flex justify-content-center invisible">
+        <div class="d-flex align-items-center">
+          <strong role="status">Loading...</strong>
+          <div class="spinner-border ms-auto" aria-hidden="true"></div>
+        </div>
+
+      </div>
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script>
+
+      var data;
+
+      function loadView(options){
+        var id = typeof options.id === "undefined" ? "app" : options.id;
+        var cb = typeof options.callback === "undefined" ? function(){} : options.callback;
+        loadingStart();
+        google.script.run.withSuccessHandler(function(html){
+          document.getElementById(id).innerHTML = html;
+          loadingEnd();
+          typeof options.params === "undefined" ? cb(): cb(options.params); 
+        })[options.func]();
+      }
+
+      function setDataForSearch() {
+        loadingStart();
+        google.script.run.withSuccessHandler(function(dataReturned){        // google script run is backend function
+          data = dataReturned.slice();
+          loadingEnd();
+        }).getDataForSearch();
+
+      }
+
+      function search(){
+        var searchInput = document.getElementById("searchInput").value.toString().toLowerCase().trim();     // to string to lowercase is for make search input not case sensitive, trim for space
+        var searchWords = searchInput.split(/\s+/);     // (/\s+/) is for multiple word for spaces
+        var searchColumns = [1,2];         // col 1, 2 means col first and last name (for searching word use what)
+        // and or
+
+        var resultsArray = searchInput === "" ? [] : data.filter(function(r){       // if search input === blanks, ? = then [] = return nothing : otherwise xx >>> this is for making the search result clear (no data display) if we not input anything in the search box
+
+          return searchWords.every(function(word){
+            return searchColumns.some(function(colIndex){
+              return r[colIndex].toString().toLowerCase().indexOf(word) !== -1
+            });
+          });
+
+        });
+
+        var recordCount = searchInput === "" ? "" : "Record: " + resultsArray.length;       // remove record count when no entry search
+        document.getElementById("searchCounter").textContent = recordCount;       // for count total rerord
+
+        var searchResultsBox = document.getElementById("searchResults");
+        var templateBox = document.getElementById("rowTemplate");
+        var template = templateBox.content;
+        
+        searchResultsBox.innerHTML = "";    // for specify the search input
+        
+        resultsArray.forEach(function(r){
+        
+          var tr = template.cloneNode(true);
+          var mutasiIDColumn = tr.querySelector(".mutasiID");                                       // .cust id is css selector 
+          var firstNameColumn = tr.querySelector(".firstName");
+          var lastNameColumn = tr.querySelector(".lastName");
+          var deleteButton = tr.querySelector(".delete-button");
+          var editButton = tr.querySelector(".edit-button");
+
+          mutasiIDColumn.textContent = r[0];
+          deleteButton.dataset.mutasiId = r[0];
+          editButton.dataset.mutasiId = r[0];
+          firstNameColumn.textContent = r[1];
+          lastNameColumn.textContent = r[2];
+          searchResultsBox.appendChild(tr);
+        })
+      }
+
+      function displayConfirmationDelete(e){        
+        if(e.target.dataset.buttonState === "delete"){
+          e.target.previousElementSibling.classList.remove("d-none");
+          e.target.textContent = "Cancel";
+          e.target.dataset.buttonState = "cancel";
+        } else {
+          e.target.previousElementSibling.classList.add("d-none");
+          e.target.textContent = "Delete";
+          e.target.dataset.buttonState = "delete";         
+        }
+      }
+
+      function deleteMutasi(e){
+        var mutasiID = e.target.dataset.mutasiId;
+        loadingStart();
+        google.script.run.withSuccessHandler(function(){
+          e.target.closest(".result-box").remove();    // closest is method. this line is for refreshing automatic data display after one of them being delete
+          var ids = data.map(function(r){ return r[0].toString().toLowerCase() });    // auto delete data deleted from popup form
+          var index = ids.indexOf(mutasiID.toString().toLowerCase());
+          data.splice(index,1);
+          loadingEnd();
+        }).deleteById(mutasiID);
+      }
+
+      function afterEditViewLoads(params){
+        //loading
+        loadingStart();
+        document.getElementById("mutasi-id").value = params.mutasiID;
+        google.script.run.withSuccessHandler(function(mutasiInfo){
+          document.getElementById("first-name").value = mutasiInfo.firstName;
+          document.getElementById("last-name").value = mutasiInfo.lastName;
+          document.getElementById("phone-number").value = mutasiInfo.phone;
+          //done loading
+          loadingEnd();
+        }).getMutasiById(params.mutasiID);
+      }
+
+      function editMutasi(){
+        loadingStart();
+        var mutasiInfo = {};
+        mutasiInfo.firstName = document.getElementById("first-name").value;
+        mutasiInfo.lastName = document.getElementById("last-name").value;
+        mutasiInfo.phone = document.getElementById("phone-number").value;
+        
+        var id = document.getElementById("mutasi-id").value;
+
+        google.script.run.withSuccessHandler(function(res){
+          document.getElementById("save-success-message").classList.remove("invisible");
+          loadingEnd();
+          setTimeout(function(){
+            document.getElementById("save-success-message").classList.add("invisible");
+          },2000);
+        }).editMutasiById(id,mutasiInfo);
+      }
+
+      function inputMutasi(){
+        loadingStart();
+        var mutasiInfo = {};
+        mutasiInfo.firstName = document.getElementById("first-name").value;
+        mutasiInfo.lastName = document.getElementById("last-name").value;
+        mutasiInfo.phone = document.getElementById("phone-number").value;
+        
+        google.script.run.withSuccessHandler(function(){
+          document.getElementById("first-name").value = "";   // clear form after add function success
+          document.getElementById("last-name").value = "";
+          document.getElementById("phone-number").value = "";
+          document.getElementById("save-success-message").classList.remove("invisible");
+          loadingEnd();
+          setTimeout(function(){
+            document.getElementById("save-success-message").classList.add("invisible");
+          },2000);
+        }).inputMutasi(mutasiInfo);
+      }
+
+      function loadSearchView() {
+        loadView({func: "loadSearchView", callback: setDataForSearch});
+      }
+
+      function loadInputMutasiView() {
+        loadView({func: "loadInputMutasiView"});
+      }
+      
+      function loadEditMutasiView(e) {
+        loadView({func: "loadEditMutasiView", callback: afterEditViewLoads, params: {mutasiID: e.target.dataset.mutasiId} });
+      }
+
+      function activeTabChange(e){
+        var navLinks = document.querySelectorAll(".main-nav .nav-link");
+        navLinks.forEach(function(linkEl){
+          linkEl.classList.remove("active");
+        });
+        e.target.classList.add("active");
+      }
+
+      function loadingStart(){
+        document.getElementById("loading").classList.remove("invisible");
+      }
+
+      function loadingEnd(){
+        document.getElementById("loading").classList.add("invisible");
+      }
+
+      document.getElementById("search-link").addEventListener("click",loadSearchView);  
+      document.getElementById("input-mutasi-link").addEventListener("click",loadInputMutasiView);
+
+      function inputEventHandler(e){              // add new func cause if we just use search, it'll affect the search box in another tab too
+        if(e.target.matches("#searchInput")){
+          search();
+        }
+      }
+
+      function clickEventHandler(e){              
+        if(e.target.matches(".delete-button")){     // using .because delete button is class. e means event
+          deleteMutasi(e);
+        }
+        if(e.target.matches(".before-delete-button")){     
+          displayConfirmationDelete(e);
+        }
+        if(e.target.matches(".edit-button")){     
+          loadEditMutasiView(e);
+        }
+        if(e.target.matches("#save-changes")){     
+          editMutasi();
+        }
+        if(e.target.matches("#cancel-changes")){     
+          loadSearchView();
+        }
+        if(e.target.matches("#input-mutasi-button")){     
+          inputMutasi();
+        }
+      }
+
+      function navClickEventHandler(e){
+        if(e.target.matches(".nav-link")){     
+          activeTabChange(e);
+        }
+      }
+
+      document.getElementById("app").addEventListener("input",inputEventHandler);
+      document.getElementById("app").addEventListener("click",clickEventHandler);
+      document.getElementById("navigation").addEventListener("click",navClickEventHandler);
+      document.addEventListener("DOMContentLoaded",loadSearchView);
+      
+    </script>
+</body>
+</html>
