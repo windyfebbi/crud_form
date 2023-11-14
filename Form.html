@@ -1,6 +1,3 @@
-<!-- ## The html code of the form goes here -->
-<!-- ## This is included in the Index.html page using "include('Form')" function -->
-
 <form id="myForm" class="p-2 border border-light rounded bg-light" onsubmit="handleFormSubmit(this)"> <!-- Call JavaScript function "handleFormSubmit" -->
     <p class="h4 mb-4 text-center">FORM MUTASI GTK JABAR</p>
     <div id="message"></div>
@@ -55,13 +52,19 @@
     </div>
 
     <div class="form-group">
-        <label for="nip">NIP</label>
-        <input type="number" class="form-control" id="nip" name="nip" placeholder="NIP">
-    </div>
-
-    <div class="form-group">
         <label for="nama" >Nama Pengusul</label>
         <input type="text" class="form-control" id="nama" name="nama" placeholder="Nama Pengusul" required>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="nip">NIP</label>
+            <input type="number" class="form-control" id="nip" name="nip" placeholder="NIP">
+        </div>   
+        <div class="form-group col-md-6">
+            <label for="noTelp">No. Telepon</label>
+            <input type="number" class="form-control" id="noTelp" name="noTelp" placeholder="Kontak Pengusul" required>   
+        </div> 
     </div>
 
     <div class="form-row">
@@ -102,7 +105,7 @@
     <div class="form-group">
         <label for="exampleFormControlSelect1">Cabang Dinas Pendidikan Wilayah</label>
         <select class="form-control" id="cdpw" name="cdpw">
-            <option>Pilih CDPW</option>
+            <option>Pilih CADISDIKWIL</option>
         </select>
     </div>
 
