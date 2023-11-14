@@ -43,7 +43,7 @@
                      "<tr>"+                               
                       "<th scope='col'>Delete</th>"+
                       "<th scope='col'>Edit</th>"+
-                      "<th scope='col'>ID</th>"+
+                      "<th scope='col'>ID</th>"+     //hide id column
                       "<th scope='col'>Nomor Agenda</th>"+
                       "<th scope='col'>Tanggal Agenda</th>"+
                       "<th scope='col'>Tanggal Masuk</th>"+
@@ -53,8 +53,9 @@
                       "<th scope='col'>Nomor Surat Lolos Butuh Asal</th>"+
                       "<th scope='col'>Tanggal Surat Lolos Butuh Tujuan</th>"+
                       "<th scope='col'>Nomor Surat Lolos Butuh Tujuan</th>"+
-                      "<th scope='col'>NIP</th>"+
                       "<th scope='col'>Nama Pengusul</th>"+
+                      "<th scope='col'>NIP</th>"+
+                      "<th scope='col'>No. Telepon</th>"+
                       "<th scope='col'>Jenis Kelamin</th>"+
                       "<th scope='col'>Tanggal Lahir</th>"+
                       "<th scope='col'>Pangkat</th>"+
@@ -95,7 +96,7 @@
       document.getElementById("message").innerHTML = "";
     }else{
       var div = document.getElementById('dataTable');
-      div.innerHTML = "Data not found!";
+      div.innerHTML = "Data tidak ditemukan!";
     }
   }
 
@@ -127,38 +128,39 @@
     document.getElementById('nslbAsal').value = records[0][7];
     document.getElementById('tslbTujuan').value = records[0][8];
     document.getElementById('nslbTujuan').value = records[0][9];
-    document.getElementById('nip').value = records[0][10];
-    document.getElementById('nama').value = records[0][11];
-    document.getElementById('jenisKelamin').value = records[0][12];
-    document.getElementById('tglLahir').value = records[0][13];
-    document.getElementById('pangkat').value = records[0][14];
-    document.getElementById('golongan').value = records[0][15];
-    document.getElementById("jabatan").value = records[0][16];
-    document.getElementById('cdpw').value = records[0][17];
-    document.getElementById("jenjangAsal").value = records[0][18];
-    document.getElementById("statusAsal").value = records[0][19];
-    document.getElementById('npsnAsal').value = records[0][20];
-    document.getElementById('sekolahAsal').value = records[0][21];
-    document.getElementById("kotaAsal").value = records[0][22];
-    document.getElementById('mapelDiampu').value = records[0][23];
-    document.getElementById("jenjangTujuan").value = records[0][24];
-    document.getElementById("statusTujuan").value = records[0][25];
-    document.getElementById('npsnTujuan').value = records[0][26];
-    document.getElementById('sekolahTujuan').value = records[0][27];
-    document.getElementById("kotaTujuan").value = records[0][28];
-    document.getElementById('mapelTujuan').value = records[0][29];
-    document.getElementById('tglVerifikasi').value = records[0][30];
-    document.getElementById("petugasVerifikasi").value = records[0][31];
-    document.getElementById("kelengkapan").value = records[0][32];
-    document.getElementById('keterangan').value = records[0][33];
-    document.getElementById("notaPertimbangan").value = records[0][34];
+    document.getElementById('nama').value = records[0][10];
+    document.getElementById('nip').value = records[0][11];
+    document.getElementById('noTelp').value = records[0][12];
+    document.getElementById('jenisKelamin').value = records[0][13];
+    document.getElementById('tglLahir').value = records[0][14];
+    document.getElementById('pangkat').value = records[0][15];
+    document.getElementById('golongan').value = records[0][16];
+    document.getElementById("jabatan").value = records[0][17];
+    document.getElementById('cdpw').value = records[0][18];
+    document.getElementById("jenjangAsal").value = records[0][19];
+    document.getElementById("statusAsal").value = records[0][20];
+    document.getElementById('npsnAsal').value = records[0][21];
+    document.getElementById('sekolahAsal').value = records[0][22];
+    document.getElementById("kotaAsal").value = records[0][23];
+    document.getElementById('mapelDiampu').value = records[0][24];
+    document.getElementById("jenjangTujuan").value = records[0][25];
+    document.getElementById("statusTujuan").value = records[0][26];
+    document.getElementById('npsnTujuan').value = records[0][27];
+    document.getElementById('sekolahTujuan').value = records[0][28];
+    document.getElementById("kotaTujuan").value = records[0][29];
+    document.getElementById('mapelTujuan').value = records[0][30];
+    document.getElementById('tglVerifikasi').value = records[0][31];
+    document.getElementById("petugasVerifikasi").value = records[0][32];
+    document.getElementById("kelengkapan").value = records[0][33];
+    document.getElementById('keterangan').value = records[0][34];
+    document.getElementById("notaPertimbangan").value = records[0][35];
     document.getElementById("message").innerHTML = "<div class='alert alert-warning' role='alert'>Update Record [ID: "+records[0][0]+"]</div>";
   }
   
   //RETRIVE DATA FROM GOOGLE SHEET FOR JABATAN DROPDOWN
   function createJabatanDropdown() {
       //SUBMIT YOUR DATA RANGE FOR DROPDOWN AS THE PARAMETER
-      google.script.run.withSuccessHandler(jabatanDropDown).getDropdownList("Jabatan!A1:A7");
+      google.script.run.withSuccessHandler(jabatanDropDown).getDropdownList("Jabatan!A1:A9");
   }
   
   //POPULATE JABATAN DROPDOWNS
@@ -294,7 +296,7 @@
   //RETRIVE DATA FROM GOOGLE SHEET FOR PETUGAS VERIFIKASI DROPDOWN
   function createPetugasVerifikasiDropdown() {
       //SUBMIT YOUR DATA RANGE FOR DROPDOWN AS THE PARAMETER
-      google.script.run.withSuccessHandler(petugasVerifikasiDropDown).getDropdownList("Petugas!A1:A4");
+      google.script.run.withSuccessHandler(petugasVerifikasiDropDown).getDropdownList("Petugas!A1:A3");
   }
   
   //POPULATE PETUGAS VERIFIKASI DROPDOWNS
