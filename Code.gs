@@ -7,10 +7,10 @@ function doGet(request) {
 function globalVariables(){ 
   var varArray = {
     spreadsheetId   : '1DebnkMmH5jIhHImTXqIpmDGdTzM25yg_mOurs8xYdK8', //** CHANGE !!!
-    dataRage        : 'MUTASI!A2:AI',                                 //** CHANGE !!!
+    dataRange       : 'MUTASI!A2:AJ',                                 //** CHANGE !!!
     idRange         : 'MUTASI!A2:A',                                  //** CHANGE !!!
-    lastCol         : 'AI',                                           //** CHANGE !!!
-    insertRange     : 'MUTASI!A1:AI1',                                //** CHANGE !!!
+    lastCol         : 'AJ',                                           //** CHANGE !!!
+    insertRange     : 'MUTASI!A1:AJ1',                                //** CHANGE !!!
     sheetID         : '0'                                             //** CHANGE !!! Ref:https://developers.google.com/sheets/api/guides/concepts#sheet_id
   };
   return varArray;
@@ -45,9 +45,10 @@ function getFormValues(formObject){
                   formObject.tslbAsal,
                   formObject.nslbAsal,
                   formObject.tslbTujuan,
-                  formObject.nslbTujuan,
-                  formObject.nip,
+                  formObject.nslbTujuan,,
                   formObject.nama,
+                  formObject.nip,
+                  formObject.noTelp,
                   formObject.jenisKelamin,
                   formObject.tglLahir,
                   formObject.pangkat,
@@ -82,8 +83,9 @@ function getFormValues(formObject){
                   formObject.nslbAsal,
                   formObject.tslbTujuan,
                   formObject.nslbTujuan,
-                  formObject.nip,
                   formObject.nama,
+                  formObject.nip,
+                  formObject.noTelp,
                   formObject.jenisKelamin,
                   formObject.tglLahir,
                   formObject.pangkat,
@@ -215,9 +217,9 @@ function getRowIndexByID(id){
 
 /*GET LAST 10 RECORDS */
 function getLastTenRows(){
-  var lastRow = readData(globalVariables().spreadsheetId,globalVariables().dataRage).length+1;
+  var lastRow = readData(globalVariables().spreadsheetId,globalVariables().dataRange).length+1;
   if(lastRow<=11){
-    var range = globalVariables().dataRage;
+    var range = globalVariables().dataRange;
   }else{
     var range = 'MUTASI!A'+(lastRow-9)+':'+globalVariables().lastCol;
   }
@@ -228,7 +230,7 @@ function getLastTenRows(){
 
 /* GET ALL RECORDS */
 function getAllData(){
-  var data = readData(globalVariables().spreadsheetId,globalVariables().dataRage);
+  var data = readData(globalVariables().spreadsheetId,globalVariables().dataRange);
   return data;
 }
 
